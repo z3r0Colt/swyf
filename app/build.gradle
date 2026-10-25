@@ -1,0 +1,46 @@
+plugins { id 'com.android.application' }
+
+android {
+    namespace 'org.gentleking.dialtone'
+    compileSdk 35
+    ndkVersion '27.2.12479018'
+    defaultConfig {
+        applicationId 'org.gentleking.dialtone'
+        minSdk 26
+        targetSdk 32
+        versionCode 2
+        versionName '0.2-native-ai'
+        ndk { abiFilters 'arm64-v8a' }
+        externalNativeBuild {
+            cmake { cppFlags '-std=c++17 -O2 -fexceptions' }
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    buildTypes {
+        release { minifyEnabled false }
+        debug { minifyEnabled false }
+    }
+    externalNativeBuild {
+        cmake { path 'src/main/cpp/CMakeLists.txt' }
+    }
+    androidResources { noCompress += ['gguf'] }
+}
+
+tasks.register('verifyBundledModel') {
+    doLast {
+        def f = file('src/main/assets/model.gguf')
+        if (!f.isFile() || f.length() < 500_000_000L) {
+            throw new GradleException('Missing complete bundled model. Run python3 tools/fetch_model.py from project root before building. No empty/model-less APK will be produced.')
+        }
+        f.withInputStream { i ->
+            byte[] magic = new byte[4]
+            if (i.read(magic) != 4 || new String(magic, 'UTF-8') != 'GGUF') {
+                throw new GradleException('model.gguf has an invalid GGUF file header.')
+            }
+        }
+    }
+}
+tasks.named('preBuild') { dependsOn 'verifyBundledModel' }

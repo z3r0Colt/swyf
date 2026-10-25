@@ -1,0 +1,9 @@
+.gradle/
+.idea/
+**/build/
+.local/
+local.properties
+app/src/main/cpp/llama.cpp/
+app/src/main/assets/model.gguf
+app/src/main/assets/*.part
+*.apk
