@@ -3,7 +3,7 @@
 import os, pathlib, sys, urllib.request
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 DEST = ROOT / 'app/src/main/assets/model.gguf'
-SOURCE = 'https://huggingface.co/bartowski/Qwen_Qwen3-1.7B-GGUF/resolve/main/Qwen3-1.7B-Q4_K_M.gguf?download=true'
+SOURCE = 'https://huggingface.co/unsloth/Qwen3.5-2B-GGUF/resolve/main/Qwen3.5-2B-Q4_K_M.gguf?download=true'
 MIN_SIZE = 1_000_000_000
 
 def valid(path):
@@ -19,10 +19,10 @@ if os.getenv('DIALTONE_MODEL_PATH'):
     import shutil
     shutil.copyfile(source, DEST)
 else:
-    print('Downloading a 1.28 GB GGUF model for embedding at APK build time...')
+    print('Downloading the 1.28 GB Qwen3.5-2B GGUF model for embedding at APK build time...')
     tmp = DEST.with_suffix('.gguf.part')
     try:
-        req = urllib.request.Request(SOURCE, headers={'User-Agent':'DIALTONE-local-android-build/0.2'})
+        req = urllib.request.Request(SOURCE, headers={'User-Agent':'DIALTONE-local-android-build/0.3'})
         with urllib.request.urlopen(req,timeout=120) as response, tmp.open('wb') as out:
             while True:
                 chunk = response.read(4*1024*1024)
